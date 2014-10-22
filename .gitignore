@@ -1,9 +1,14 @@
 # IDE
 .idea
 *.iml
+out
 
 # Vagrant
 .vagrant
+
+# Gradle
+.gradle
+build
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
