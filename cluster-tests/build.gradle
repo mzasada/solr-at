@@ -9,8 +9,12 @@ repositories {
 }
 
 dependencies {
-  // Tests
+  // Apache Solr
+  testCompile 'org.apache.solr:solr-solrj:4.6.0'
+  // Spock
   testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+  // Logging
+  testCompile 'commons-logging:commons-logging:1.2'
 }
 
 task wrapper(type: Wrapper) {
