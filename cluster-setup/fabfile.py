@@ -30,6 +30,7 @@ def setup_cloud():
         run('cp -r example node-2')
 
     with cd('~/solr-4.6.0/node-1'):
+        run('cp /vagrant/jetty/jetty.xml etc/jetty.xml')
         run_in_bg('java '
                   '-Djetty.port=9001 '
                   '-DzkRun '
@@ -40,7 +41,8 @@ def setup_cloud():
                   '>& /dev/null < /dev/null')
 
     with cd('~/solr-4.6.0/node-2'):
-        run_in_bg(' java '
+        run('cp /vagrant/jetty/jetty.xml etc/jetty.xml')
+        run_in_bg('java '
                   '-Djetty.port=9002 '
                   '-DzkHost=localhost:10001 '
                   '-jar start.jar '
