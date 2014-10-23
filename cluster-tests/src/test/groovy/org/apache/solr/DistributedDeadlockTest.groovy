@@ -12,10 +12,11 @@ import spock.util.concurrent.PollingConditions
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
 class DistributedDeadlockTest extends Specification {
 
-  private static final int REQUEST_COUNT = 1
+  private static final int REQUEST_COUNT = 20
 
   @Shared
   def connections = connectToClusters()
@@ -46,7 +47,7 @@ class DistributedDeadlockTest extends Specification {
 
   def "should not detect any deadlocks"() {
     given:
-    def conditions = new PollingConditions(timeout: 5, initialDelay: 1, delay: 0.5)
+    def conditions = new PollingConditions(timeout: 10, initialDelay: 1, delay: 0.5)
     List<Future<QueryResponse>> responses = []
 
     when:
@@ -58,9 +59,10 @@ class DistributedDeadlockTest extends Specification {
 
     then:
     conditions.eventually {
+      print("requests send: ${responses.size()}")
       assert responses.size() == REQUEST_COUNT
       assert responses.every {
-        it.get().getResults().size() == 1
+        it.get(5, TimeUnit.SECONDS).getResults().size() == 1
       }
     }
 
