@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit
 
 class DistributedDeadlockTest extends Specification {
 
-  private static final int REQUEST_COUNT = 20
-
   @Shared
   def connections = connectToClusters()
 
@@ -48,10 +46,11 @@ class DistributedDeadlockTest extends Specification {
   def "should not detect any deadlocks"() {
     given:
     def conditions = new PollingConditions(timeout: 10, initialDelay: 1, delay: 0.5)
+    int requestCount = 10
     List<Future<QueryResponse>> responses = []
 
     when:
-    (1..REQUEST_COUNT).each {
+    (1..requestCount).each {
       responses << executor.submit({
         conection.query(new SolrQuery("*:*"))
       } as Callable)
@@ -60,7 +59,7 @@ class DistributedDeadlockTest extends Specification {
     then:
     conditions.eventually {
       print("requests send: ${responses.size()}")
-      assert responses.size() == REQUEST_COUNT
+      assert responses.size() == requestCount
       assert responses.every {
         it.get(5, TimeUnit.SECONDS).getResults().size() == 1
       }
