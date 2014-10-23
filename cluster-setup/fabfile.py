@@ -3,7 +3,7 @@ from fabric.api import task
 from fabric.context_managers import cd
 from fabric.operations import run
 
-from fabtools import require
+from fabtools import require, oracle_jdk
 from fabtools.require import deb
 
 LOCATION_SOLR_4_6_0 = 'http://archive.apache.org/dist/lucene/solr/4.6.0/solr-4.6.0.tgz'
@@ -16,7 +16,7 @@ def provision():
 
 
 def install_dependencies():
-    require.deb.package('openjdk-7-jre-headless', update=True)
+    oracle_jdk.install_from_oracle_site()
     require.deb.package('dtach', update=True)
 
 
