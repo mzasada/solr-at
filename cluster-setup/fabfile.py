@@ -2,8 +2,8 @@
 from fabric.api import task
 from fabric.context_managers import cd
 from fabric.operations import run
-from fabtools.vagrant import vagrant
 
+from fabtools.vagrant import vagrant
 from fabtools import require, oracle_jdk
 
 SOLR_4_6_0_DOWNLOAD_URL = 'http://archive.apache.org/dist/lucene/solr/4.6.0/solr-4.6.0.tgz'
@@ -61,5 +61,5 @@ def bootstrap_cluster():
                       '>& /dev/null < /dev/null')
 
 
-def run_in_bg(cmd, sockname='dtach'):
-    run("dtach -n `mktemp -u /tmp/{}.XXXX` {}".format(sockname, cmd))
+def run_in_bg(cmd):
+    run("dtach -n `mktemp -u /tmp/dtach.XXXX` {}".format(cmd))
