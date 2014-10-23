@@ -22,7 +22,7 @@ def install_dependencies():
 
 def setup_cloud():
     with cd('~/'):
-        # run('wget –q {0}'.format(LOCATION_SOLR_4_6_0))
+        run('wget -o solr-download.log –q {0} || exit 0'.format(LOCATION_SOLR_4_6_0))
         run('tar xf solr-4.6.0.tgz solr-4.6.0')
 
     with cd('~/solr-4.6.0'):
