@@ -8,19 +8,22 @@ from fabtools import require, oracle_jdk
 
 SOLR_4_6_0_DOWNLOAD_URL = 'http://archive.apache.org/dist/lucene/solr/4.6.0/solr-4.6.0.tgz'
 SOLR_4_6_0_LOCATION = "~/solr-4.6.0"
+SOLR_4_6_0_DD_LOCATION = "~/solr-4.6.0-dd"
 
 
 @task
 def provision():
     install_dependencies()
     download_solr_distro()
-    bootstrap_cluster()
+    bootstrap_cluster(SOLR_4_6_0_LOCATION, 8000)
+    bootstrap_cluster(SOLR_4_6_0_DD_LOCATION, 8100)
 
 
 @task
 def restart_clusters():
     run('killall -9 java || exit 0')
-    bootstrap_cluster()
+    bootstrap_cluster(SOLR_4_6_0_LOCATION, 8000)
+    bootstrap_cluster(SOLR_4_6_0_DD_LOCATION, 8100)
 
 
 def install_dependencies():
@@ -34,8 +37,15 @@ def download_solr_distro():
         run('tar xf solr-4.6.0.tgz {0}'.format(SOLR_4_6_0_LOCATION))
 
 
-def bootstrap_cluster():
-    with cd(SOLR_4_6_0_LOCATION):
+@task
+def mv_solr():
+    run('rm -rf {}'.format(SOLR_4_6_0_DD_LOCATION))
+    run('mkdir -p {}'.format(SOLR_4_6_0_DD_LOCATION))
+    run('mv /vagrant/example {}'.format(SOLR_4_6_0_DD_LOCATION))
+
+
+def bootstrap_cluster(solr_home, port_base):
+    with cd(solr_home):
         run('rm -rf node-1')
         run('rm -rf node-2')
         run('cp -r example node-1')
@@ -44,21 +54,21 @@ def bootstrap_cluster():
         with cd('node-1'):
             run('cp /vagrant/jetty/jetty.xml etc/jetty.xml')
             run_in_bg('java '
-                      '-Djetty.port=9001 '
+                      '-Djetty.port={} '
                       '-DzkRun '
                       '-DnumShards=2 '
                       '-Dbootstrap_confdir=./solr/collection1/conf '
                       '-Dcollection.configName=myconf '
                       '-jar start.jar '
-                      '>& /dev/null < /dev/null')
+                      '>& /dev/null < /dev/null'.format(port_base + 1))
 
         with cd('node-2'):
             run('cp /vagrant/jetty/jetty.xml etc/jetty.xml')
             run_in_bg('java '
-                      '-Djetty.port=9002 '
-                      '-DzkHost=localhost:10001 '
+                      '-Djetty.port={} '
+                      '-DzkHost=localhost:{} '
                       '-jar start.jar '
-                      '>& /dev/null < /dev/null')
+                      '>& /dev/null < /dev/null'.format(port_base + 2, port_base + 1001))
 
 
 def run_in_bg(cmd):

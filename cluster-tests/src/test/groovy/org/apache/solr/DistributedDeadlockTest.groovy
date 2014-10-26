@@ -7,6 +7,7 @@ import org.apache.solr.client.solrj.response.QueryResponse
 import org.apache.solr.common.SolrInputDocument
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Unroll
 import spock.util.concurrent.PollingConditions
 
 import java.util.concurrent.Callable
@@ -43,6 +44,7 @@ class DistributedDeadlockTest extends Specification {
     }
   }
 
+  @Unroll("should not detect any deadlocks for cluster #conection")
   def "should not detect any deadlocks"() {
     given:
     def conditions = new PollingConditions(timeout: 10, initialDelay: 1, delay: 0.5)
@@ -71,9 +73,10 @@ class DistributedDeadlockTest extends Specification {
 
   private List<SolrServer> connectToClusters() {
     [
-        // vanilla Apache Solr 4.6.0
-        new LBHttpSolrServer("http://localhost:9001/solr/collection1", "http://localhost:9002/solr/collection1")
         // Modified Apache Solr 4.6.0
+        new LBHttpSolrServer("http://localhost:8101/solr/collection1", "http://localhost:8102/solr/collection1")
+        // vanilla Apache Solr 4.6.0
+//        new LBHttpSolrServer("http://localhost:8001/solr/collection1", "http://localhost:8002/solr/collection1")
     ]
   }
 }

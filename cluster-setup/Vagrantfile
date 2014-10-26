@@ -5,8 +5,10 @@ Vagrant.configure("2") do |config|
   config.vm.box = "precise64"
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
-  config.vm.network :forwarded_port, guest: 9001, host: 9001
-  config.vm.network :forwarded_port, guest: 9002, host: 9002
+  config.vm.network :forwarded_port, guest: 8001, host: 8001
+  config.vm.network :forwarded_port, guest: 8002, host: 8002
+  config.vm.network :forwarded_port, guest: 8101, host: 8101
+  config.vm.network :forwarded_port, guest: 8102, host: 8102
 
   config.vm.provision :fabric do |fabric|
       fabric.fabfile_path = "./fabfile.py"
