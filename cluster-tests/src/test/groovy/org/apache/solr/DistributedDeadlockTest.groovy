@@ -8,7 +8,6 @@ import org.apache.solr.common.SolrInputDocument
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
-import spock.util.concurrent.PollingConditions
 
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
@@ -47,24 +46,23 @@ class DistributedDeadlockTest extends Specification {
   @Unroll("should not detect any deadlocks for cluster #conection")
   def "should not detect any deadlocks"() {
     given:
-    def conditions = new PollingConditions(timeout: 10, initialDelay: 1, delay: 0.5)
-    int requestCount = 10
-    List<Future<QueryResponse>> responses = []
+    int requestCount = 50
+    List<Future<QueryResponse>> futures = []
 
     when:
     (1..requestCount).each {
-      responses << executor.submit({
+      futures << executor.submit({
         conection.query(new SolrQuery("*:*"))
       } as Callable)
     }
+    def responses = futures.collect {
+      it.get(10, TimeUnit.SECONDS)
+    }
 
     then:
-    conditions.eventually {
-      print("requests send: ${responses.size()}")
-      assert responses.size() == requestCount
-      assert responses.every {
-        it.get(5, TimeUnit.SECONDS).getResults().size() == 1
-      }
+    assert responses.size() == requestCount
+    assert responses.every {
+      it.getResults().size() == 1
     }
 
     where:
