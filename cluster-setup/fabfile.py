@@ -16,7 +16,7 @@ def provision():
     install_dependencies()
     download_solr_distro()
     bootstrap_cluster(SOLR_4_6_0_LOCATION, 8000)
-    bootstrap_cluster(SOLR_4_6_0_DD_LOCATION, 8100)
+    bootstrap_cluster(SOLR_4_6_0_LOCATION, 8100)
 
 
 @task
